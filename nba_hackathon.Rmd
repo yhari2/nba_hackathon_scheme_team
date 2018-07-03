@@ -8,62 +8,36 @@ output: html_document
 ```{r}
 library(tidyverse)
 library(kableExtra)
+library(pander)
 ```
-
-
-```{r}
-event_codes <- read_tsv("event_codes.txt")
-
-unique(event_codes$Action_Type)
-unique(event_codes$Event_Msg_Type_Description)
-
-game_lineups <- read_tsv("game_lineup.txt")
-unique(game_lineups$status)
-
-play_by_play <- read_tsv("play_by_play.txt")
-
-play_by_play %>%
-    head()
-```
-
-
 
 
 
 ```{r}
-play_by_play %>%
-    head()
+EventCodes = read_tsv("event_codes.txt")
+names(EventCodes)
+#ones and eigths
+PlayCodes = read_tsv("play_by_play.txt")
+nrow(PlayCodes)
+sum(PlayCodes$Event_Msg_Type == 1)
+sum(PlayCodes$Event_Msg_Type == 8)
+elems = which(PlayCodes$Event_Msg_Type == 1 | PlayCodes$Event_Msg_Type == 8)
+cleaned_input <- PlayCodes[c(elems),]
+
+output_dataset <- cbind(cleaned_input$Game_id)
+output_dataset <- cbind(output_dataset, cleaned_input$Team_id)
+output_dataset <- cbind(output_dataset, cleaned_input$Action_Type)
+output_dataset <- cbind(output_dataset, cleaned_input$Event_Msg_Type)
+output_dataset <- cbind(output_dataset, cleaned_input$Person1)
+output_dataset <- cbind(output_dataset, cleaned_input$Person2)
+
+colnames(output_dataset) <- c("game_id", "team_id", "action_type", "made_or_sub", "person_1", "person_2")
+
+# confirm
+dim(output_dataset)
+output_dataset %>% head()
+
+# write
+write.csv(output_dataset, file = "cleaned_data.csv")
 ```
-
-
-```{r}
-output_dataset <- play_by_play[1]
-
-output_dataset <- output_dataset %>%
-    cbind(play_by_play$Team_id)
-
-output_dataset <- output_dataset %>%
-    cbind(play_by_play$Action_Type)
-
-output_dataset <- output_dataset %>%
-    cbind(play_by_play$Person1)
-
-output_dataset <- output_dataset %>%
-    cbind(play_by_play$Person2)
-
-
-colnames(output_dataset) <- c("game_id", "team_id", "action_type", "player_1", 
-                              "player_2") 
-
-output_dataset %>%
-    names()
-
-output_dataset %>% 
-    head() %>%
-    kable()
-
-# TODO: Add points to the data frame,
-#       factor the action type into "Scoring play"/"Sub"
-```
-
 
