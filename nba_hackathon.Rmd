@@ -1,0 +1,69 @@
+---
+title: "nba_hackathon"
+author: "Yash Hari"
+date: "7/1/2018"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(kableExtra)
+```
+
+
+```{r}
+event_codes <- read_tsv("event_codes.txt")
+
+unique(event_codes$Action_Type)
+unique(event_codes$Event_Msg_Type_Description)
+
+game_lineups <- read_tsv("game_lineup.txt")
+unique(game_lineups$status)
+
+play_by_play <- read_tsv("play_by_play.txt")
+
+play_by_play %>%
+    head()
+```
+
+
+
+
+
+```{r}
+play_by_play %>%
+    head()
+```
+
+
+```{r}
+output_dataset <- play_by_play[1]
+
+output_dataset <- output_dataset %>%
+    cbind(play_by_play$Team_id)
+
+output_dataset <- output_dataset %>%
+    cbind(play_by_play$Action_Type)
+
+output_dataset <- output_dataset %>%
+    cbind(play_by_play$Person1)
+
+output_dataset <- output_dataset %>%
+    cbind(play_by_play$Person2)
+
+
+colnames(output_dataset) <- c("game_id", "team_id", "action_type", "player_1", 
+                              "player_2") 
+
+output_dataset %>%
+    names()
+
+output_dataset %>% 
+    head() %>%
+    kable()
+
+# TODO: Add points to the data frame,
+#       factor the action type into "Scoring play"/"Sub"
+```
+
+
