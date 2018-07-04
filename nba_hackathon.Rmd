@@ -24,20 +24,20 @@ sum(PlayCodes$Event_Msg_Type == 8)
 elems = which(PlayCodes$Event_Msg_Type == 1 | PlayCodes$Event_Msg_Type == 8)
 cleaned_input <- PlayCodes[c(elems),]
 
-output_dataset <- cbind(cleaned_input$Game_id)
-output_dataset <- cbind(output_dataset, cleaned_input$Team_id)
-output_dataset <- cbind(output_dataset, cleaned_input$Action_Type)
-output_dataset <- cbind(output_dataset, cleaned_input$Event_Msg_Type)
-output_dataset <- cbind(output_dataset, cleaned_input$Person1)
-output_dataset <- cbind(output_dataset, cleaned_input$Person2)
+output_dataset <- cbind(game_id = cleaned_input$Game_id) # Game ID
+output_dataset <- cbind(output_dataset, team_id = cleaned_input$Team_id) # Team ID
+output_dataset <- cbind(output_dataset, period = cleaned_input$Period) # Period 
+output_dataset <- cbind(output_dataset, action_type = cleaned_input$Action_Type) # Action Type
+output_dataset <- cbind(output_dataset, made_or_sub = cleaned_input$Event_Msg_Type) # Made or Sub
+output_dataset <- cbind(output_dataset, person_1 = cleaned_input$Person1) # p1
+output_dataset <- cbind(output_dataset, person_2 = cleaned_input$Person2) # p2 
 
-colnames(output_dataset) <- c("game_id", "team_id", "action_type", "made_or_sub", "person_1", "person_2")
 
 # confirm
 dim(output_dataset)
 output_dataset %>% head()
 
 # write
-write.csv(output_dataset, file = "cleaned_data.csv")
+write.csv(output_dataset, file = "cleaned_data.csv", quote = F)
 ```
 
