@@ -38,6 +38,6 @@ dim(output_dataset)
 output_dataset %>% head()
 
 # write
-write.csv(output_dataset, file = "cleaned_data.csv", quote = F)
+write.csv(output_dataset, file = "cleaned_data_periods.csv", quote = F)
 ```
 
