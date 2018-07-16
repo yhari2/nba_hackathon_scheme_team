@@ -1,12 +1,13 @@
+from numpy import genfromtxt
 import numpy as np
 from scipy import optimize
 
 class NeuralNetwork(object):
     def __init__(self):        
         #Define Hyperparameters
-        self.inputLayerSize = 8
-        self.outputLayerSize = 1
+        self.inputLayerSize = 7
         self.hiddenLayerSize = 3
+        self.outputLayerSize = 1
         
         #Weights (parameters)
         self.W1 = np.random.randn(self.inputLayerSize,self.hiddenLayerSize)
@@ -15,10 +16,14 @@ class NeuralNetwork(object):
     def forward(self, X):
         #Propogate inputs though network
         self.z2 = np.dot(X, self.W1)
-        self.a2 = self.sigmoid(self.z2)
-        self.z3 = np.dot(self.a2, self.W2)
-        yHat = self.sigmoid(self.z3) 
+        self.a2 = self.z2
+        self.z3 = np.dot(self.z2, self.W2)
+        yHat = self.z3 
         return yHat
+
+    def ReLU(self, x):
+        return x * (x > 0)
+
         
     def sigmoid(self, z):
         #Apply sigmoid activation function to scalar, vector, or matrix
@@ -26,7 +31,7 @@ class NeuralNetwork(object):
     
     def sigmoidPrime(self,z):
         #Gradient of sigmoid
-        return np.exp(-z)/((1+np.exp(-z))**2)
+        return self.sigmoid(z)*(1 - self.sigmoid(z))
     
     def costFunction(self, X, y):
         #Compute cost for given X,y, use weights already stored in class.
@@ -99,16 +104,20 @@ class Trainer(object):
         #Make Local reference to network:
         self.N = N
         
+
     def callbackF(self, params):
         self.N.setParams(params)
         self.J.append(self.N.costFunction(self.X, self.y))   
         
+
     def costFunctionWrapper(self, params, X, y):
         self.N.setParams(params)
         cost = self.N.costFunction(X, y)
         grad = self.N.computeGradients(X,y)
+        print(cost)
         return cost, grad
         
+
     def train(self, X, y):
         #Make an internal variable for the callback function:
         self.X = X
@@ -129,8 +138,40 @@ class Trainer(object):
 		
 
 def main():
+    training_X = genfromtxt("train_X.csv", delimiter = ",", )	
+    training_y = genfromtxt("train_y.csv", delimiter = ",")	
+    test = genfromtxt("test.csv", delimiter = ",")
 	
+	# batch testing took too long, split arrays here
+    training_X = training_X.reshape((2000, 7))
+    training_y = training_y.reshape((2000, 1))
+    test = test.reshape((460, 7))
+    
+    #training_batches = np.vsplit(training_X, 2)
+    #tr_X1 = training_batches[0]
+    #tr_X2 = training_batches[1]
+	
+    #print(tr_X1.shape)
+    #print(tr_X2.shape)
+
+    training_batches_y = np.vsplit(training_y, 2)
+    #tr_y1 = training_batches_y[0]
+    #tr_y2 = training_batches_y[1]
+
+    #print(tr_y1.shape)
+    #print(tr_y2.shape)
+
+    NN = NeuralNetwork()
+    trainer = Trainer(NN)
+    #trainer.train(tr_X1, tr_y1)	
+    #trainer.train(tr_X2, tr_y2)
+    trainer.train(training_X, training_y)	
+
+	# now that the net is trained, we can test it
+    results = NN.forward(test)
+    # results = np.asarray(results)
+		
+	# print this array into the results file
+    np.savetxt("results.csv", results, delimiter = ",")
 	
 main()
-
-
