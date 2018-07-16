@@ -16,8 +16,9 @@ def main():
     with open('sorted_play_by_play.txt', 'r') as data:
         data = csv.reader(data, delimiter="\t")
 
-        global game, period, team1, team2, players1, players2, foul_present1, foul_present2
-        next(data) # skips header
+        global game, period, team1, team2, players1, players2
+        global foul_present1, foul_present2
+        next(data)  # skips header
 
         # Iterates over plays in the data file
         for row in data:
@@ -30,8 +31,10 @@ def main():
             # This means we've reached a new period
             if(period != row[3]):
                 period = row[3]
-                for p in players1.values(): p.status = False
-                for p in players2.values(): p.status = False
+                for p in players1.values():
+                    p.status = False
+                for p in players2.values():
+                    p.status = False
                 init_lineup()
 
             # Check type of the action and handle accordingly
@@ -47,11 +50,15 @@ def main():
             elif(int(row[2]) == 3):
                 # Handle points for all active players when foul occurred
                 if(team_from_player(row[11]) is players1):
-                    for p in foul_present1: p.score(int(row[7]))
-                    for p in foul_present2: p.score(-int(row[7]))
+                    for p in foul_present1:
+                        p.score(int(row[7]))
+                    for p in foul_present2:
+                        p.score(-int(row[7]))
                 elif(team_from_player(row[11]) is players2):
-                    for p in foul_present2: p.score(int(row[7]))
-                    for p in foul_present1: p.score(-int(row[7]))
+                    for p in foul_present2:
+                        p.score(int(row[7]))
+                    for p in foul_present1:
+                        p.score(-int(row[7]))
             elif(int(row[2]) == 1):
                 # Add points to every active player on the scoring team
                 for p in team_from_player(row[11]).values():
@@ -91,12 +98,15 @@ def write_game():
     global players1, players2
     if(game is None):
         with open("result.csv", "w") as result:
-            csv.writer(result).writerow(["Game_ID", "Player_ID", "Player_Plus/Minus"])
+            (csv.writer(result, lineterminator="\n")
+                .writerow(["Game_ID", "Player_ID", "Player_Plus/Minus"]))
     else:
         with open("result.csv", "a") as result:
-            result = csv.writer(result)
-            for p in players1.values(): result.writerow([game, p.pid, p.diff])
-            for p in players2.values(): result.writerow([game, p.pid, p.diff])
+            result = csv.writer(result, lineterminator="\n")
+            for p in players1.values():
+                result.writerow([game, p.pid, p.diff])
+            for p in players2.values():
+                result.writerow([game, p.pid, p.diff])
 
 
 # Returns the player dict from the desired team or the other if other is True
@@ -119,12 +129,15 @@ def reset():
 
 # Handles initial sorting of plays to ensure correct ordering
 def sort_data():
-    with open("play_by_play.txt", "r") as plays, open("sorted_play_by_play.txt", "w") as out:
+    with open("play_by_play.txt", "r") as plays, \
+            open("sorted_play_by_playt.txt", "w") as out:
+
         plays = csv.reader(plays, delimiter="\t")
         out = csv.writer(out, delimiter="\t", lineterminator="\n")
 
         out.writerow(next(plays))
-        sorted_rows = sorted(plays, key=lambda row: (row[0], row[3], -int(row[5]), row[4], row[1]))
+        sorted_rows = sorted(plays, key=lambda row:
+                             (row[0], row[3], -int(row[5]), row[4], row[1]))
         for row in sorted_rows:
             out.writerow(row)
 
