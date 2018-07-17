@@ -2,6 +2,8 @@ from numpy import genfromtxt
 import numpy as np
 from scipy import optimize
 
+# loosely adopted from Welch labs tutorial
+
 class NeuralNetwork(object):
     def __init__(self):        
         #Define Hyperparameters
@@ -21,10 +23,7 @@ class NeuralNetwork(object):
         yHat = self.z3 
         return yHat
 
-    def ReLU(self, x):
-        return x * (x > 0)
 
-        
     def sigmoid(self, z):
         #Apply sigmoid activation function to scalar, vector, or matrix
         return 1/(1+np.exp(-z))
@@ -32,7 +31,8 @@ class NeuralNetwork(object):
     def sigmoidPrime(self,z):
         #Gradient of sigmoid
         return self.sigmoid(z)*(1 - self.sigmoid(z))
-    
+   
+ 
     def costFunction(self, X, y):
         #Compute cost for given X,y, use weights already stored in class.
         self.yHat = self.forward(X)
@@ -135,6 +135,13 @@ class Trainer(object):
         self.N.setParams(_res.x)
         self.optimizationResults = _res
 
+
+
+def MAPEfunction(results, y):
+	numerator = results - y 
+	numerator = numerator / y
+	result = np.sum(numerator)
+	return abs(result) / 2000
 		
 
 def main():
@@ -147,25 +154,15 @@ def main():
     training_y = training_y.reshape((2000, 1))
     test = test.reshape((460, 7))
     
-    #training_batches = np.vsplit(training_X, 2)
-    #tr_X1 = training_batches[0]
-    #tr_X2 = training_batches[1]
-	
-    #print(tr_X1.shape)
-    #print(tr_X2.shape)
-
-    training_batches_y = np.vsplit(training_y, 2)
-    #tr_y1 = training_batches_y[0]
-    #tr_y2 = training_batches_y[1]
-
-    #print(tr_y1.shape)
-    #print(tr_y2.shape)
-
+    
     NN = NeuralNetwork()
     trainer = Trainer(NN)
-    #trainer.train(tr_X1, tr_y1)	
-    #trainer.train(tr_X2, tr_y2)
     trainer.train(training_X, training_y)	
+
+    error = 0
+    error += MAPEfunction(NN.forward(training_X), training_y)
+    error = error.sum()
+    print(error)
 
 	# now that the net is trained, we can test it
     results = NN.forward(test)
@@ -173,5 +170,7 @@ def main():
 		
 	# print this array into the results file
     np.savetxt("results.csv", results, delimiter = ",")
+
+    
 	
 main()
