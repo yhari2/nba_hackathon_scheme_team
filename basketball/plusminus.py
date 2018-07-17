@@ -30,10 +30,16 @@ def main():
                 init_lineup()
             # This means we've reached a new period
             if(period != row[3]):
+                print("Game {} Period {}".format(game[:3], period))
                 period = row[3]
+                sum = 0
+                print("Team {}".format(team1[:3]))
                 for p in players1.values():
+                    print("Player {} : {}".format(p.pid[:3], p.diff))
                     p.status = False
+                print("Team {}".format(team1[:3]))
                 for p in players2.values():
+                    print("Player {} : {}".format(p.pid[:3], p.diff))
                     p.status = False
                 init_lineup()
 
@@ -49,16 +55,17 @@ def main():
                 foul_present2 = [x for x in players2.values() if x.status]
             elif(int(row[2]) == 3):
                 # Handle points for all active players when foul occurred
-                if(team_from_player(row[11]) is players1):
-                    for p in foul_present1:
-                        p.score(int(row[7]))
-                    for p in foul_present2:
-                        p.score(-int(row[7]))
-                elif(team_from_player(row[11]) is players2):
-                    for p in foul_present2:
-                        p.score(int(row[7]))
-                    for p in foul_present1:
-                        p.score(-int(row[7]))
+                if(int(row[7]) == 1):
+                    if(team_from_player(row[11]) is players1):
+                        for p in foul_present1:
+                            p.score(1)
+                        for p in foul_present2:
+                            p.score(-1)
+                    elif(team_from_player(row[11]) is players2):
+                        for p in foul_present2:
+                            p.score(1)
+                        for p in foul_present1:
+                            p.score(-1)
             elif(int(row[2]) == 1):
                 # Add points to every active player on the scoring team
                 for p in team_from_player(row[11]).values():
@@ -68,6 +75,7 @@ def main():
                 for p in team_from_player(row[11], True).values():
                     if(p.status):
                         p.score(-int(row[7]))
+        write_game()
 
 
 # Initializes player dicts for a given period, adding and activating starters
@@ -130,7 +138,7 @@ def reset():
 # Handles initial sorting of plays to ensure correct ordering
 def sort_data():
     with open("play_by_play.txt", "r") as plays, \
-            open("sorted_play_by_playt.txt", "w") as out:
+            open("sorted_play_by_play.txt", "w") as out:
 
         plays = csv.reader(plays, delimiter="\t")
         out = csv.writer(out, delimiter="\t", lineterminator="\n")
