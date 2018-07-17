@@ -37,7 +37,7 @@ def main():
                 for p in players1.values():
                     print("Player {} : {}".format(p.pid[:3], p.diff))
                     p.status = False
-                print("Team {}".format(team1[:3]))
+                print("Team {}".format(team2[:3]))
                 for p in players2.values():
                     print("Player {} : {}".format(p.pid[:3], p.diff))
                     p.status = False
